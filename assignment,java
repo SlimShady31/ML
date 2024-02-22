@@ -1,0 +1,78 @@
+import java.util.Arrays;
+
+public class NeuralNetwork {
+
+    public static void main(String[] args) {
+        // Given data points
+        double[][] data = {
+                {1, 0, 1},
+                {2, 1, 9},
+                {0, 1, 1},
+                {-2, 1, 7}
+        };
+
+        // Initialize weights
+        double w1 = 0.5;
+        double w2 = -0.5;
+
+        // Learning rate
+        double learningRate = 0.01;
+
+        // Number of data points
+        int N = data.length;
+
+        // Training loop
+        for (int epoch = 0; epoch < 1000; epoch++) {
+            // Compute gradients and update weights
+            double[] gradients = computeGradients(data, w1, w2);
+            w1 -= learningRate * gradients[0];
+            w2 -= learningRate * gradients[1];
+
+            // Print current weights and loss for every 100 epochs
+            if (epoch % 100 == 0) {
+                double loss = computeMSE(data, w1, w2);
+                System.out.println("Epoch " + epoch + ": w1 = " + w1 + ", w2 = " + w2 + ", Loss = " + loss);
+            }
+        }
+    }
+
+    // Compute Mean Squared Error (MSE) loss
+    private static double computeMSE(double[][] data, double w1, double w2) {
+        double sumSquaredError = 0;
+        for (double[] point : data) {
+            double x1 = point[0];
+            double x2 = point[1];
+            double y = point[2];
+            double predictedY = w1 * x1 + w2 * x2;
+            double squaredError = Math.pow(predictedY - y, 2);
+            sumSquaredError += squaredError;
+        }
+        return sumSquaredError / data.length;
+    }
+
+    // Compute gradients of the loss with respect to weights w1 and w2
+    private static double[] computeGradients(double[][] data, double w1, double w2) {
+        double sumGradientW1 = 0;
+        double sumGradientW2 = 0;
+
+        for (double[] point : data) {
+            double x1 = point[0];
+            double x2 = point[1];
+            double y = point[2];
+            double predictedY = w1 * x1 + w2 * x2;
+
+            // Gradients
+            double gradientW1 = 2 * (predictedY - y) * x1;
+            double gradientW2 = 2 * (predictedY - y) * x2;
+
+            sumGradientW1 += gradientW1;
+            sumGradientW2 += gradientW2;
+        }
+
+        // Average gradients over all data points
+        double avgGradientW1 = sumGradientW1 / data.length;
+        double avgGradientW2 = sumGradientW2 / data.length;
+
+        return new double[]{avgGradientW1, avgGradientW2};
+    }
+}
